@@ -1,6 +1,6 @@
 ﻿namespace PointsGeneration
 {
-    partial class Form1
+    partial class PointGeneration
     {
         /// <summary>
         /// Required designer variable.
@@ -34,9 +34,7 @@
             this.filePath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.setsPositions = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.multiplicityRadius = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -47,6 +45,8 @@
             this.label9 = new System.Windows.Forms.Label();
             this.pointsCount = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.distanceDifference = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // LinearSeparability
@@ -71,7 +71,7 @@
             // 
             // GenerateButton
             // 
-            this.GenerateButton.Location = new System.Drawing.Point(614, 272);
+            this.GenerateButton.Location = new System.Drawing.Point(550, 276);
             this.GenerateButton.Name = "GenerateButton";
             this.GenerateButton.Size = new System.Drawing.Size(118, 22);
             this.GenerateButton.TabIndex = 2;
@@ -83,7 +83,7 @@
             // 
             this.filePath.Location = new System.Drawing.Point(224, 42);
             this.filePath.Name = "filePath";
-            this.filePath.Size = new System.Drawing.Size(379, 20);
+            this.filePath.Size = new System.Drawing.Size(332, 20);
             this.filePath.TabIndex = 3;
             // 
             // label2
@@ -98,45 +98,25 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(33, 158);
+            this.label3.Location = new System.Drawing.Point(72, 174);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(94, 13);
             this.label3.TabIndex = 6;
             this.label3.Text = "Для разделимых";
             // 
-            // setsPositions
-            // 
-            this.setsPositions.FormattingEnabled = true;
-            this.setsPositions.Items.AddRange(new object[] {
-            "С касаниями",
-            "На расстоянии"});
-            this.setsPositions.Location = new System.Drawing.Point(224, 174);
-            this.setsPositions.Name = "setsPositions";
-            this.setsPositions.Size = new System.Drawing.Size(115, 21);
-            this.setsPositions.TabIndex = 5;
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(33, 241);
+            this.label4.Location = new System.Drawing.Point(60, 241);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(106, 13);
             this.label4.TabIndex = 8;
             this.label4.Text = "Для неразделимых";
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(221, 158);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(119, 13);
-            this.label5.TabIndex = 9;
-            this.label5.Text = "Положение множеств";
-            // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(354, 158);
+            this.label6.Location = new System.Drawing.Point(221, 136);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(147, 13);
             this.label6.TabIndex = 11;
@@ -144,9 +124,9 @@
             // 
             // multiplicityRadius
             // 
-            this.multiplicityRadius.Location = new System.Drawing.Point(357, 175);
+            this.multiplicityRadius.Location = new System.Drawing.Point(224, 153);
             this.multiplicityRadius.Name = "multiplicityRadius";
-            this.multiplicityRadius.Size = new System.Drawing.Size(131, 20);
+            this.multiplicityRadius.Size = new System.Drawing.Size(135, 20);
             this.multiplicityRadius.TabIndex = 12;
             // 
             // label7
@@ -162,12 +142,12 @@
             // 
             this.intersectionPercentage.Location = new System.Drawing.Point(224, 257);
             this.intersectionPercentage.Name = "intersectionPercentage";
-            this.intersectionPercentage.Size = new System.Drawing.Size(116, 20);
+            this.intersectionPercentage.Size = new System.Drawing.Size(135, 20);
             this.intersectionPercentage.TabIndex = 15;
             // 
             // multiplicityDistance
             // 
-            this.multiplicityDistance.Location = new System.Drawing.Point(516, 175);
+            this.multiplicityDistance.Location = new System.Drawing.Point(421, 153);
             this.multiplicityDistance.Name = "multiplicityDistance";
             this.multiplicityDistance.Size = new System.Drawing.Size(135, 20);
             this.multiplicityDistance.TabIndex = 17;
@@ -175,7 +155,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(513, 158);
+            this.label8.Location = new System.Drawing.Point(418, 136);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(222, 13);
             this.label8.TabIndex = 16;
@@ -183,7 +163,7 @@
             // 
             // radiusDerivation
             // 
-            this.radiusDerivation.Location = new System.Drawing.Point(735, 174);
+            this.radiusDerivation.Location = new System.Drawing.Point(224, 193);
             this.radiusDerivation.Name = "radiusDerivation";
             this.radiusDerivation.Size = new System.Drawing.Size(135, 20);
             this.radiusDerivation.TabIndex = 19;
@@ -191,17 +171,17 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(732, 157);
+            this.label9.Location = new System.Drawing.Point(221, 176);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(185, 13);
+            this.label9.Size = new System.Drawing.Size(191, 13);
             this.label9.TabIndex = 18;
-            this.label9.Text = "Рандомная разница радиусов (в %)";
+            this.label9.Text = "Рандомная разница радиусов (в +%)";
             // 
             // pointsCount
             // 
             this.pointsCount.Location = new System.Drawing.Point(36, 101);
             this.pointsCount.Name = "pointsCount";
-            this.pointsCount.Size = new System.Drawing.Size(131, 20);
+            this.pointsCount.Size = new System.Drawing.Size(155, 20);
             this.pointsCount.TabIndex = 21;
             // 
             // label10
@@ -213,11 +193,28 @@
             this.label10.TabIndex = 20;
             this.label10.Text = "Количество точек в одном классе";
             // 
-            // Form1
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(418, 176);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(197, 13);
+            this.label5.TabIndex = 9;
+            this.label5.Text = "Рандомная разница расстяний (в +%)";
+            // 
+            // distanceDifference
+            // 
+            this.distanceDifference.Location = new System.Drawing.Point(421, 193);
+            this.distanceDifference.Name = "distanceDifference";
+            this.distanceDifference.Size = new System.Drawing.Size(135, 20);
+            this.distanceDifference.TabIndex = 22;
+            // 
+            // PointGeneration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(961, 339);
+            this.ClientSize = new System.Drawing.Size(738, 339);
+            this.Controls.Add(this.distanceDifference);
             this.Controls.Add(this.pointsCount);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.radiusDerivation);
@@ -231,13 +228,12 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.setsPositions);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.filePath);
             this.Controls.Add(this.GenerateButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.LinearSeparability);
-            this.Name = "Form1";
+            this.Name = "PointGeneration";
             this.Text = "Point Generation";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -252,9 +248,7 @@
         private System.Windows.Forms.TextBox filePath;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ComboBox setsPositions;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox multiplicityRadius;
         private System.Windows.Forms.Label label7;
@@ -265,6 +259,8 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox pointsCount;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox distanceDifference;
     }
 }
 
