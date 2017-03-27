@@ -17,8 +17,9 @@ namespace test
         {
             int[] a = new int[3] { 3, 4, 5 };
             int[] b = new int[3] { 0, 0, 0 };
-            b[1] = a[1];
-            a[1] = 9;
+            var z = a;
+            z[0] = 10;
+            a[0] = 9;
         }
     }
 }
