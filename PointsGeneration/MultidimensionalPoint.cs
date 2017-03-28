@@ -17,6 +17,31 @@ namespace PointsGeneration
             pointClass = -1;
             radius = -1;
         }
-
+        public MultidimensionalPoint(MultidimensionalPoint a)
+        {
+            coordinates = new double[15];
+            pointClass = a.pointClass;
+            radius = a.radius;
+            for(int i = 0; i < coordinates.Length; ++i)
+            {
+                coordinates[i] = a.coordinates[i];
+            }
+        }
+        public void Add(double number)
+        {
+            for (int i = 0; i < coordinates.Length; ++i)
+            {
+                coordinates[i] += number;
+            }
+        }
+        public void Add(double[] vector)
+        {
+            if (vector.Length != coordinates.Length)
+                throw new Exception("Wrong vector length.");
+            for (int i = 0; i < coordinates.Length; ++i)
+            {
+                coordinates[i] += vector[i];
+            }
+        }
     }
 }

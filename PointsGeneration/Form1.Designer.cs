@@ -47,6 +47,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.distanceDifference = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LinearSeparability
@@ -71,7 +72,7 @@
             // 
             // GenerateButton
             // 
-            this.GenerateButton.Location = new System.Drawing.Point(550, 276);
+            this.GenerateButton.Location = new System.Drawing.Point(543, 255);
             this.GenerateButton.Name = "GenerateButton";
             this.GenerateButton.Size = new System.Drawing.Size(118, 22);
             this.GenerateButton.TabIndex = 2;
@@ -209,11 +210,22 @@
             this.distanceDifference.Size = new System.Drawing.Size(135, 20);
             this.distanceDifference.TabIndex = 22;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(586, 283);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 23;
+            this.button1.Text = "MassTest";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // PointGeneration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(738, 339);
+            this.ClientSize = new System.Drawing.Size(682, 326);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.distanceDifference);
             this.Controls.Add(this.pointsCount);
             this.Controls.Add(this.label10);
@@ -261,6 +273,7 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox distanceDifference;
+        private System.Windows.Forms.Button button1;
     }
 }
 

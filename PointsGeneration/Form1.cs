@@ -15,24 +15,25 @@ using System.Diagnostics;
 namespace PointsGeneration
 {
     // Расстояние Евклидово
-    // TODO: fix ignorance or the between-class distance randomization
-    //        static double in start can be suppressed
-    //        counters. Something should be done. Otherwise I will forget about them.
-    //          do something with crossLength function. Do I need it?
+    // Пересечение - высчитывается вхождение класса малого радиуса в класс большего радиуса. Классы пересекаются по двое.
+    // TODO:  need dimension tolerance
+    //        all this static can be moved to button code
     public partial class PointGeneration : Form
     {
         static StringBuilder csv = new StringBuilder();
         static MultidimensionalPoint[] points;
         static string path;
-        static int initialNumberOfPoints;
-        static double initialFirstRadius;
-        static double initialDistanceBetweenClasses;
-        static double initialDifferenceInRadiuses;
-        static double initialCrossRateInDouble;
+        static int userPointsCountInClass;
+        static double userFirstRadius;
+        static double userDistBetweenClasses;
+        static double userDiffInRadiuses;
+        static double userDistBetweenClassesDiff;
+        static double userCrossRateInDouble;
         static double crossOkDeltaInRadiuses = 0.2;
-        static double crossOkDeltaInClasses = 0.05;
+        static double crossOkDeltaInClasses;
         static double shiftingValueForSeparable = 0.01;
-        static double shiftingValueForNonSeparable = 11;
+        static double shiftingValueForNonSeparable = 1;
+        static Stopwatch watch = new Stopwatch();
 
         public PointGeneration()
         {
@@ -44,21 +45,24 @@ namespace PointsGeneration
             multiplicityDistance.Text = "0";
             radiusDerivation.Text = "25";
             distanceDifference.Text = "30";
-            intersectionPercentage.Text = "10";
+            intersectionPercentage.Text = "50";
         }
 
         private void GenerateButton_Click(object sender, EventArgs e)
         {
+            watch.Restart();
             // State now: takes path, firstRadius, numberOfPoints, differenceInRadiuses, distanceBetweenClasses
 
             path = filePath.Text;
-            initialNumberOfPoints = Convert.ToInt32(pointsCount.Text);
-            initialFirstRadius = Convert.ToDouble(multiplicityRadius.Text);
-            initialDistanceBetweenClasses = Convert.ToDouble(multiplicityDistance.Text);
-            initialDifferenceInRadiuses = Convert.ToDouble(radiusDerivation.Text)/100;
-            initialCrossRateInDouble = Convert.ToDouble(intersectionPercentage.Text) / 100;
+            userPointsCountInClass = Convert.ToInt32(pointsCount.Text);
+            userFirstRadius = Convert.ToDouble(multiplicityRadius.Text);
+            userDistBetweenClasses = Convert.ToDouble(multiplicityDistance.Text);
+            userDiffInRadiuses = Convert.ToDouble(radiusDerivation.Text) / 100;
+            userDistBetweenClassesDiff = Convert.ToDouble(distanceDifference.Text) / 100;
+            userCrossRateInDouble = Convert.ToDouble(intersectionPercentage.Text) / 100;
+            crossOkDeltaInClasses = Math.Max(0.01, 1.0/userPointsCountInClass);
 
-            points = new MultidimensionalPoint[initialNumberOfPoints * 15];
+            points = new MultidimensionalPoint[userPointsCountInClass * 15];
             for (int i = 0; i < points.Length; ++i)
             {
                 points[i] = new MultidimensionalPoint();
@@ -91,18 +95,18 @@ namespace PointsGeneration
                 // First class
 
                 // Data needed soon
-                firstClassIndex = groupIterator * 2 * initialNumberOfPoints; 
+                firstClassIndex = groupIterator * 2 * userPointsCountInClass; 
                 points[firstClassIndex].pointClass = pointClass;
-                points[firstClassIndex].radius = GenerateRadius(initialFirstRadius, initialDifferenceInRadiuses, random);
-                secondClassIndex = firstClassIndex + initialNumberOfPoints;
-                points[secondClassIndex].radius = GenerateRadius(initialFirstRadius, initialDifferenceInRadiuses, random);
+                points[firstClassIndex].radius = GenerateRadius(userFirstRadius, userDiffInRadiuses, random);
+                secondClassIndex = firstClassIndex + userPointsCountInClass;
+                points[secondClassIndex].radius = GenerateRadius(userFirstRadius, userDiffInRadiuses, random);
 
-                for (int i = 0; i < new MultidimensionalPoint().coordinates.Length; ++i)
+                for (int i = 0; i < points[firstClassIndex].coordinates.Length; ++i)
                 {
                     points[firstClassIndex].coordinates[i] = random.Next(1000) - 500;
                 }
-                if (!ThisCentralPointIsFarFromOtherClasses(groupIterator, 
-                    points[firstClassIndex].radius + points[secondClassIndex].radius)){
+                if (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass))
+                {
                     double[] shiftingVector;
                     shiftingVector = GenerateNewShiftingVector(15, shiftingValueForNonSeparable);
                     do
@@ -112,51 +116,35 @@ namespace PointsGeneration
                             points[firstClassIndex].coordinates[i] += shiftingVector[i];
                         }
 
-                    } while (!ThisCentralPointIsFarFromOtherClasses(groupIterator, 
-                        points[firstClassIndex].radius + points[secondClassIndex].radius));
+                    } while (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass));
                 }
-                GeneratePointsOfClass(firstClassIndex, initialNumberOfPoints, ref pointClass, random);
+                GeneratePointsOfClass(firstClassIndex, userPointsCountInClass, pointClass, random);
 
                 // Second class
-                // Generating certain distance between two classes, so there will be given percentage of interception
-                double intersectionInDouble;
-                double distanceBetweenCenters;
-
-                points[secondClassIndex].pointClass = pointClass + 1;
-                distanceBetweenCenters = (points[firstClassIndex].radius + points[secondClassIndex].radius) * ( 1 - initialCrossRateInDouble);
-                GenerateRandomPointWithSetDistance(firstClassIndex, secondClassIndex, distanceBetweenCenters, random);
-                intersectionInDouble = GetCrossRateOfSpheres(points[firstClassIndex], points[secondClassIndex]);
-                Debug.Assert(intersectionInDouble < initialCrossRateInDouble * (1 + crossOkDeltaInRadiuses) && 
-                    intersectionInDouble > initialCrossRateInDouble * (1 - crossOkDeltaInRadiuses), "IntersectionInDouble");
-
-                // Generating second class points.
-                // If we get not what we want, change center of one class and remake its points.
-                double finalCrossRate = 0;
-                bool thisIsAppropriatePercentage = false;
-                int attempts = 0;
-                do
+                // Overall idea: generating center in the same place as 1st. Moving it till get right interseption.
+                pointClass++;
+                points[secondClassIndex].pointClass = pointClass;
+                for (int i = 0; i < points[secondClassIndex].coordinates.Length; ++i )
                 {
-                    thisIsAppropriatePercentage = false;
-                    for (int i = 0; i < 5; ++i)
-                    {
-                        GeneratePointsOfClass(secondClassIndex, initialNumberOfPoints, ref pointClass, random);
-                        finalCrossRate = GetCrossRateOfClasses(firstClassIndex, secondClassIndex, initialNumberOfPoints);
-                        thisIsAppropriatePercentage = finalCrossRate < initialCrossRateInDouble * (1 + crossOkDeltaInClasses) &&
-                            finalCrossRate > initialCrossRateInDouble * (1 - crossOkDeltaInClasses);
-                        if (thisIsAppropriatePercentage)
-                            break;
-                    }
-                    if(!thisIsAppropriatePercentage)
-                    {
-                        SolveSituation(firstClassIndex, secondClassIndex, initialCrossRateInDouble, finalCrossRate, crossOkDeltaInClasses);
-                    }
-                    attempts++;
-                } while (!thisIsAppropriatePercentage);
-                check(points[0], points[firstClassIndex]);
-                pointClass += 2;
+                    points[secondClassIndex].coordinates[i] = points[firstClassIndex].coordinates[i];
+                }
+                GeneratePointsOfClass(secondClassIndex, userPointsCountInClass, pointClass, random);
+                double initialCrossRate = GetCrossRateOfClassPoints(firstClassIndex, secondClassIndex, userPointsCountInClass);
+                Debug.Assert(initialCrossRate == 1.0);
+
+                // Defining where the zero interseption is located
+                double[] movingVector = GenerateNewShiftingVector(15, shiftingValueForNonSeparable);
+                do{
+                    points[secondClassIndex].Add(movingVector);
+                    GeneratePointsOfClass(secondClassIndex, userPointsCountInClass, pointClass, random);
+                    if (watch.Elapsed.Seconds > 5) pointClass = pointClass;
+                } while (GetCrossRateOfClassPoints(firstClassIndex, secondClassIndex, userPointsCountInClass) > 0);
+                BinarySearch(movingVector, firstClassIndex, secondClassIndex, pointClass, random);
+                pointClass++;
             }
             
         }
+
         private void GenerateLinearSeparable ()
         {
             Random random = new Random();
@@ -166,13 +154,13 @@ namespace PointsGeneration
             int trueIndex;
 
             // First class
-            for (int i = 0; i < new MultidimensionalPoint().coordinates.Length; ++i)
+            for (int i = 0; i < points[0].coordinates.Length; ++i)
             {
                 points[0].coordinates[i] = random.Next(1000) - 500;
             }
-            points[0].radius = GenerateRadius(initialFirstRadius, initialDifferenceInRadiuses, random);
+            points[0].radius = GenerateRadius(userFirstRadius, userDiffInRadiuses, random);
             points[0].pointClass = pointClass;
-            GeneratePointsOfClass(0, initialNumberOfPoints, ref pointClass, random);
+            GeneratePointsOfClass(0, userPointsCountInClass, pointClass, random);
             pointClass++;
 
             // Other classes
@@ -180,21 +168,21 @@ namespace PointsGeneration
             for (int overallIteator = 1; overallIteator < 15; overallIteator++)
             {
                 shiftingVector = GenerateNewShiftingVector(15, shiftingValueForSeparable);
-                trueIndex = overallIteator * initialNumberOfPoints;
+                trueIndex = overallIteator * userPointsCountInClass;
                 // Generate central point of a class
-                for (int i = 0; i < new MultidimensionalPoint().coordinates.Length; ++i)
+                for (int i = 0; i < points[trueIndex].coordinates.Length; ++i)
                 {
                     points[trueIndex].coordinates[i] = points[trueIndex - 1].coordinates[i];
                 }
-                points[trueIndex].radius = GenerateRadius(initialFirstRadius, initialDifferenceInRadiuses, random);
+                points[trueIndex].radius = GenerateRadius(userFirstRadius, userDiffInRadiuses, random);
                 points[trueIndex].pointClass = pointClass;
-                while (ThisCentralPointIntersectsWithOtherClasses(trueIndex, initialDistanceBetweenClasses))
+                while (ThisClassCrossesOtherClasses(trueIndex, userDistBetweenClasses, userDistBetweenClassesDiff, random))
                 {
                     ShiftPoint(points[trueIndex], shiftingVector);
                 }
 
                 // Generating all other points inside the group
-                GeneratePointsOfClass(trueIndex, initialNumberOfPoints, ref pointClass, random);
+                GeneratePointsOfClass(trueIndex, userPointsCountInClass, pointClass, random);
                 pointClass++;
             }
         }
@@ -224,7 +212,9 @@ namespace PointsGeneration
                     points[i].pointClass));
             }
             File.WriteAllText(path, csv.ToString(), Encoding.UTF8);
-            MessageBox.Show("done");
+            TimeSpan time = watch.Elapsed;
+            watch.Stop();
+            MessageBox.Show(String.Format("Done in {0} ms", time.Milliseconds));
         }
 
         private double Distance(MultidimensionalPoint a, MultidimensionalPoint b)
@@ -237,12 +227,13 @@ namespace PointsGeneration
             return Math.Sqrt(sum);
         }
 
-        private bool ThisCentralPointIntersectsWithOtherClasses(int index, double distanceBetweenClasses)
+        private bool ThisClassCrossesOtherClasses(int index, double distanceBetweenClasses, double distanceDifference, Random rand)
         {
-            for(int i = index - initialNumberOfPoints; i >= 0; i-=initialNumberOfPoints)
+            double actualDistanceBetweenClasses = distanceBetweenClasses * (1 + rand.NextDouble() * distanceDifference * distanceBetweenClasses);
+            for(int i = index - userPointsCountInClass; i >= 0; i-=userPointsCountInClass)
             {
                 Debug.Assert(points[i].radius > 0, "ThisCentralPointIntersectsWithOtherClasses");
-                if(Distance(points[i],points[index]) < points[i].radius + points[index].radius + distanceBetweenClasses)
+                if (Distance(points[i], points[index]) < points[i].radius + points[index].radius + actualDistanceBetweenClasses)
                 {
                     return true;
                 }
@@ -287,12 +278,12 @@ namespace PointsGeneration
             return initialRadius + differenceInRadius * randResult * initialRadius;
         }
 
-        private bool ThisCentralPointIsFarFromOtherClasses(int index, double radiusSum)
+        private bool ThisCentralPointIsFarFromOtherClasses(int index, int pointsInClass)
         {
-            for (int i = index - initialNumberOfPoints; i >= 0; i -= initialNumberOfPoints)
+            for (int i = index - pointsInClass; i >= 0; i -= pointsInClass)
             {
                 Debug.Assert(points[i].radius > 0, "ThisCentralPointIsFarFromOtherClasses");
-                if (Distance(points[i], points[index]) < Math.Max(2 * (points[i].radius + points[index].radius), initialDistanceBetweenClasses))
+                if (Distance(points[i], points[index]) < 3 * (points[i].radius + points[index].radius))
                 {
                     return false;
                 }
@@ -305,40 +296,34 @@ namespace PointsGeneration
             Debug.Assert(a.radius > 0 && b.radius > 0);
 
             double midResult = GetCrossLength(a, b);
-            double finalResult = Math.Max(0, midResult /= Distance(a,b));
+            double finalResult = Math.Max(0, midResult /= GetMaxCrossDistance(a,b));
 
             return finalResult;
         }
 
-        private double GetCrossRateOfClasses(int indexA, int indexB, int numberOfPointsInClass)
+        private double GetCrossRateOfClassPoints(int indexA, int indexB, int numberOfPointsInClass)
         {
             int pointsInIntersectionCounter = 0;
-            double minDistComparedToRadius = double.MaxValue;
-            for(int i = 0; i < initialNumberOfPoints; ++i)
+            int minRadiusClassIndex;
+            int otherRadiusClassIndex;
+            if (points[indexA].radius <= points[indexB].radius){
+                minRadiusClassIndex = indexA;
+                otherRadiusClassIndex = indexB;
+            }
+            else{
+                minRadiusClassIndex = indexB;
+                otherRadiusClassIndex = indexA;
+            }
+            for(int i = 0; i < userPointsCountInClass; ++i)
             {
-                double distAiToB = Distance(points[indexA + i], points[indexB]);
-                double distBiToA = Distance(points[indexB + i], points[indexA]);
+                double distMinToOther = Distance(points[minRadiusClassIndex + i], points[otherRadiusClassIndex]);
 
-                // TODO this is for test
-                if (distAiToB - points[indexB].radius < minDistComparedToRadius)
-                {
-                    minDistComparedToRadius = distAiToB - points[indexB].radius;
-                }
-                if (distBiToA - points[indexA].radius < minDistComparedToRadius)
-                {
-                    minDistComparedToRadius = distBiToA - points[indexA].radius;
-                }
-
-                if(distAiToB < points[indexB].radius)
-                {
-                    pointsInIntersectionCounter++;
-                }
-                if(distBiToA < points[indexA].radius)
+                if (distMinToOther < points[otherRadiusClassIndex].radius)
                 {
                     pointsInIntersectionCounter++;
                 }
             }
-            double result = (double)pointsInIntersectionCounter/(numberOfPointsInClass * 2);
+            double result = (double)pointsInIntersectionCounter / numberOfPointsInClass;
 
             return result;
         }
@@ -346,11 +331,11 @@ namespace PointsGeneration
         private double GetCrossLength(MultidimensionalPoint a, MultidimensionalPoint b)
         {
             Debug.Assert(a.radius > 0 && b.radius > 0);
-            double result = Math.Min(Math.Min(a.radius, b.radius), a.radius + b.radius - Distance(a, b));
+            double result = Math.Min(GetMaxCrossDistance(a,b), (a.radius + b.radius - Distance(a, b)));
             return result;
         }
 
-        private void GeneratePointsOfClass(int startingIndex_, int numberOfPoints_, ref int pointClass_, Random random)
+        private void GeneratePointsOfClass(int startingIndex_, int numberOfPoints_, int pointClass_, Random random)
         {
             double distanceFromCenter = 0;
             for(int i = 1; i < numberOfPoints_; ++i)
@@ -412,52 +397,174 @@ namespace PointsGeneration
             var k = Distance(points[anchorPointIndex], points[generatedPointIndex]);
         }
         
-        private void check(MultidimensionalPoint a, MultidimensionalPoint b)
+        private double check(MultidimensionalPoint a, MultidimensionalPoint b)
         {
-            double some = Distance(a, b) - (a.radius + b.radius);
+            double some = a.radius + b.radius - Distance(a, b);
+            return some;
         }
 
-        private void SolveSituation(int indexOf1stCenter, int indexOf2ndCenter, double percentageNeeded, double percentageGot, double trustInterval)
+        private bool GeneratePointsAndCheckResult(int firstClassIndex_, int secondClassIndex_, int pointClass_, Random rand_, bool itIsNear_)
         {
-            // Moving second to first.
-            double crossingLength;
-            double distance = Distance(points[indexOf1stCenter], points[indexOf2ndCenter]);
-            crossingLength = GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]);
-            double newCrossingLength = 0;
-            if (percentageGot < percentageNeeded * (1 - trustInterval))
+            double finalCrossRate = 0;
+            bool thisIsOkPercentage = false;
+            if (itIsNear_)
             {
-                if (crossingLength > 0)
+                for (int i = 0; i < 5; ++i)
                 {
-                    // TODO. Is this right number?
-                    newCrossingLength = Math.Min(Math.Min(crossingLength * 1.01, points[indexOf1stCenter].radius), points[indexOf2ndCenter].radius);
-                }
-                else
-                {
-                    newCrossingLength = 0.1;
+                    GeneratePointsOfClass(secondClassIndex_, userPointsCountInClass, pointClass_, rand_);
+                    finalCrossRate = GetCrossRateOfClassPoints(firstClassIndex_, secondClassIndex_, userPointsCountInClass);
+                    thisIsOkPercentage = finalCrossRate < userCrossRateInDouble + crossOkDeltaInClasses &&
+                        finalCrossRate > userCrossRateInDouble - crossOkDeltaInClasses;
+                    if (thisIsOkPercentage)
+                        break;
                 }
             }
             else
             {
-                newCrossingLength *= 0.5;
+                GeneratePointsOfClass(secondClassIndex_, userPointsCountInClass, pointClass_, rand_);
+                finalCrossRate = GetCrossRateOfClassPoints(firstClassIndex_, secondClassIndex_, userPointsCountInClass);
+                thisIsOkPercentage = finalCrossRate < userCrossRateInDouble + crossOkDeltaInClasses &&
+                    finalCrossRate > userCrossRateInDouble - crossOkDeltaInClasses;
+            }
+
+            return thisIsOkPercentage;
+        }
+
+        private void FindRightIntersetion(int indexOf1stCenter, int indexOf2ndCenter, double percentageNeeded, double trustInterval)
+        {
+            // Moving second class to the first one.
+            double[] movingVector = new double[points[0].coordinates.Length];
+            double percentageGot = GetCrossRateOfClassPoints(indexOf1stCenter, indexOf2ndCenter, userPointsCountInClass);
+
+            if(percentageGot == 0)
+            {
+                for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
+                {
+                    movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / 
+                        Math.Sqrt(Distance(points[indexOf1stCenter], points[indexOf2ndCenter]));
+                }
+                // Move till get some intersection
+                do
+                {
+                    for (int i = 0; i < points[indexOf2ndCenter].coordinates.Length; ++i )
+                    {
+                        points[indexOf2ndCenter].coordinates[i] += movingVector[i];
+                    }
+                }while(GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]) == 0);
+                
+            }
+                double crossingLength = GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]),
+                distance = 0;
+                double solverStep = 0;
+            double newCrossingLength = crossingLength;
+            if (percentageGot <= percentageNeeded - trustInterval){
+                if (crossingLength > 0){
+                    if(percentageGot == 0){
+                        solverStep *= 1.1;
+                    }
+                    newCrossingLength = Math.Min(crossingLength * (1 + solverStep), GetMaxCrossDistance(points[indexOf1stCenter], points[indexOf2ndCenter]));
+                }
+                else{
+                    newCrossingLength = 0.1;
+                }
+            }
+            else{
+                newCrossingLength *= 1-solverStep;
+                solverStep *= 0.8;
             }
             
-            Debug.Assert(newCrossingLength < Math.Min(points[indexOf1stCenter].radius, points[indexOf2ndCenter].radius), "Wrong crossingLength!");
+            Debug.Assert(newCrossingLength <= GetMaxCrossDistance(points[indexOf1stCenter], points[indexOf2ndCenter]), "Wrong crossingLength!");
             double deltaCrossingLength = newCrossingLength - crossingLength;
             double desiredDistance = distance - deltaCrossingLength;
 
             // Finding normalized vector of movement
-            double[] movingVector = new double[points[indexOf1stCenter].coordinates.Length];
             double sqrtedDistanse = Math.Sqrt(distance);
-            for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
+            bool alreadyCalculatedVector = false;
+            if(percentageNeeded > 0.49)
             {
-                movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / sqrtedDistanse;
+                if (!alreadyCalculatedVector)
+                {
+                    alreadyCalculatedVector = true;
+                    for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
+                    {
+                        movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / sqrtedDistanse;
+                    }
+                }
             }
-
+            else
+            {
+                for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
+                {
+                    movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / sqrtedDistanse;
+                }
+            }
+            
             //Move
             for (int i = 0; i < points[indexOf2ndCenter].coordinates.Length; ++i )
             {
+                // TODO Do I need this 0.2?
                 points[indexOf2ndCenter].coordinates[i] += movingVector[i] * 0.2 * deltaCrossingLength;
             }
+            double newActualCrossing = GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]);
+            if(percentageGot > 0.84)
+            {
+                int k = 0;
+            }
+        }
+
+        private double GetMaxCrossDistance(MultidimensionalPoint a, MultidimensionalPoint b)
+        {
+            Debug.Assert(a.radius > 0 && b.radius > 0);
+            return Math.Min(a.radius * 2, b.radius * 2);
+        }
+
+        private void BinarySearch(double[] shiftingVector, int firstClassIndex_, int secondClassIndex_, int pointClass_, Random rand_)
+        {
+            double[] first = new double[points[firstClassIndex_].coordinates.Length];
+            double[] last = new double[points[firstClassIndex_].coordinates.Length];
+            points[firstClassIndex_].coordinates.CopyTo(first, 0);
+            points[secondClassIndex_].coordinates.CopyTo(last, 0);
+
+            double crossRate = GetCrossRateOfClassPoints(firstClassIndex_, secondClassIndex_, userPointsCountInClass);
+            bool crossRateIsOk = crossRate >= userCrossRateInDouble - crossOkDeltaInClasses && crossRate <= userCrossRateInDouble + crossOkDeltaInClasses;
+            while(!crossRateIsOk)
+            {
+                for(int i = 0; i < last.Length; ++i)
+                {
+                    points[secondClassIndex_].coordinates[i] = first[i] + (last[i] - first[i]) / 2;
+                }
+                for(int i = 0; i < 10; ++i)
+                {
+                    GeneratePointsOfClass(secondClassIndex_, userPointsCountInClass, pointClass_, rand_);
+                    crossRate = GetCrossRateOfClassPoints(firstClassIndex_, secondClassIndex_, userPointsCountInClass);
+                    crossRateIsOk = crossRate >= userCrossRateInDouble - crossOkDeltaInClasses && crossRate <= userCrossRateInDouble + crossOkDeltaInClasses;
+                    if (crossRateIsOk)
+                        break;
+                }
+                if(!crossRateIsOk)
+                {
+                    if (crossRate < userCrossRateInDouble - crossOkDeltaInClasses)
+                    {
+                        points[secondClassIndex_].coordinates.CopyTo(last, 0);
+                    }
+                    else
+                    {
+                        Debug.Assert(crossRate > userCrossRateInDouble + crossOkDeltaInClasses);
+                        points[secondClassIndex_].coordinates.CopyTo(first, 0);
+                    }
+                }
+                if (watch.Elapsed.Seconds > 7) pointClass_ = pointClass_;
+            }
+
+        }
+        
+        private void button1_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 7; ++i)
+            {
+                GenerateButton_Click(sender, e);
+            }
+            //MessageBox.Show("Success");
         }
     }
 }
