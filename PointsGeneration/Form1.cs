@@ -29,7 +29,6 @@ namespace PointsGeneration
         static double userDiffInRadiuses;
         static double userDistBetweenClassesDiff;
         static double userCrossRateInDouble;
-        static double crossOkDeltaInRadiuses = 0.2;
         static double crossOkDeltaInClasses;
         static double shiftingValueForSeparable = 0.01;
         static double shiftingValueForNonSeparable = 1;
@@ -290,16 +289,6 @@ namespace PointsGeneration
             }
             return true;
         }
-        
-        private double GetCrossRateOfSpheres(MultidimensionalPoint a, MultidimensionalPoint b)
-        {
-            Debug.Assert(a.radius > 0 && b.radius > 0);
-
-            double midResult = GetCrossLength(a, b);
-            double finalResult = Math.Max(0, midResult /= GetMaxCrossDistance(a,b));
-
-            return finalResult;
-        }
 
         private double GetCrossRateOfClassPoints(int indexA, int indexB, int numberOfPointsInClass)
         {
@@ -325,13 +314,6 @@ namespace PointsGeneration
             }
             double result = (double)pointsInIntersectionCounter / numberOfPointsInClass;
 
-            return result;
-        }
-
-        private double GetCrossLength(MultidimensionalPoint a, MultidimensionalPoint b)
-        {
-            Debug.Assert(a.radius > 0 && b.radius > 0);
-            double result = Math.Min(GetMaxCrossDistance(a,b), (a.radius + b.radius - Distance(a, b)));
             return result;
         }
 
@@ -397,12 +379,6 @@ namespace PointsGeneration
             var k = Distance(points[anchorPointIndex], points[generatedPointIndex]);
         }
         
-        private double check(MultidimensionalPoint a, MultidimensionalPoint b)
-        {
-            double some = a.radius + b.radius - Distance(a, b);
-            return some;
-        }
-
         private bool GeneratePointsAndCheckResult(int firstClassIndex_, int secondClassIndex_, int pointClass_, Random rand_, bool itIsNear_)
         {
             double finalCrossRate = 0;
@@ -428,94 +404,6 @@ namespace PointsGeneration
             }
 
             return thisIsOkPercentage;
-        }
-
-        private void FindRightIntersetion(int indexOf1stCenter, int indexOf2ndCenter, double percentageNeeded, double trustInterval)
-        {
-            // Moving second class to the first one.
-            double[] movingVector = new double[points[0].coordinates.Length];
-            double percentageGot = GetCrossRateOfClassPoints(indexOf1stCenter, indexOf2ndCenter, userPointsCountInClass);
-
-            if(percentageGot == 0)
-            {
-                for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
-                {
-                    movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / 
-                        Math.Sqrt(Distance(points[indexOf1stCenter], points[indexOf2ndCenter]));
-                }
-                // Move till get some intersection
-                do
-                {
-                    for (int i = 0; i < points[indexOf2ndCenter].coordinates.Length; ++i )
-                    {
-                        points[indexOf2ndCenter].coordinates[i] += movingVector[i];
-                    }
-                }while(GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]) == 0);
-                
-            }
-                double crossingLength = GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]),
-                distance = 0;
-                double solverStep = 0;
-            double newCrossingLength = crossingLength;
-            if (percentageGot <= percentageNeeded - trustInterval){
-                if (crossingLength > 0){
-                    if(percentageGot == 0){
-                        solverStep *= 1.1;
-                    }
-                    newCrossingLength = Math.Min(crossingLength * (1 + solverStep), GetMaxCrossDistance(points[indexOf1stCenter], points[indexOf2ndCenter]));
-                }
-                else{
-                    newCrossingLength = 0.1;
-                }
-            }
-            else{
-                newCrossingLength *= 1-solverStep;
-                solverStep *= 0.8;
-            }
-            
-            Debug.Assert(newCrossingLength <= GetMaxCrossDistance(points[indexOf1stCenter], points[indexOf2ndCenter]), "Wrong crossingLength!");
-            double deltaCrossingLength = newCrossingLength - crossingLength;
-            double desiredDistance = distance - deltaCrossingLength;
-
-            // Finding normalized vector of movement
-            double sqrtedDistanse = Math.Sqrt(distance);
-            bool alreadyCalculatedVector = false;
-            if(percentageNeeded > 0.49)
-            {
-                if (!alreadyCalculatedVector)
-                {
-                    alreadyCalculatedVector = true;
-                    for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
-                    {
-                        movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / sqrtedDistanse;
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < points[indexOf1stCenter].coordinates.Length; ++i)
-                {
-                    movingVector[i] = (points[indexOf1stCenter].coordinates[i] - points[indexOf2ndCenter].coordinates[i]) / sqrtedDistanse;
-                }
-            }
-            
-            //Move
-            for (int i = 0; i < points[indexOf2ndCenter].coordinates.Length; ++i )
-            {
-                // TODO Do I need this 0.2?
-                points[indexOf2ndCenter].coordinates[i] += movingVector[i] * 0.2 * deltaCrossingLength;
-            }
-            double newActualCrossing = GetCrossLength(points[indexOf1stCenter], points[indexOf2ndCenter]);
-            if(percentageGot > 0.84)
-            {
-                int k = 0;
-            }
-        }
-
-        private double GetMaxCrossDistance(MultidimensionalPoint a, MultidimensionalPoint b)
-        {
-            Debug.Assert(a.radius > 0 && b.radius > 0);
-            return Math.Min(a.radius * 2, b.radius * 2);
         }
 
         private void BinarySearch(double[] shiftingVector, int firstClassIndex_, int secondClassIndex_, int pointClass_, Random rand_)
