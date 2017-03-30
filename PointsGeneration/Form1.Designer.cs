@@ -48,6 +48,10 @@
             this.label5 = new System.Windows.Forms.Label();
             this.distanceDifference = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.dimensions = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.status = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // LinearSeparability
@@ -220,11 +224,47 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // dimensions
+            // 
+            this.dimensions.Location = new System.Drawing.Point(224, 101);
+            this.dimensions.Name = "dimensions";
+            this.dimensions.Size = new System.Drawing.Size(135, 20);
+            this.dimensions.TabIndex = 25;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(221, 84);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(125, 13);
+            this.label11.TabIndex = 24;
+            this.label11.Text = "Количество измерений";
+            // 
+            // status
+            // 
+            this.status.Location = new System.Drawing.Point(526, 313);
+            this.status.Name = "status";
+            this.status.Size = new System.Drawing.Size(135, 20);
+            this.status.TabIndex = 27;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(479, 316);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(41, 13);
+            this.label12.TabIndex = 26;
+            this.label12.Text = "Статус";
+            // 
             // PointGeneration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(682, 326);
+            this.ClientSize = new System.Drawing.Size(670, 344);
+            this.Controls.Add(this.status);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.dimensions);
+            this.Controls.Add(this.label11);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.distanceDifference);
             this.Controls.Add(this.pointsCount);
@@ -274,6 +314,10 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox distanceDifference;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox dimensions;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox status;
+        private System.Windows.Forms.Label label12;
     }
 }
 

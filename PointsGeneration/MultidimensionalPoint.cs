@@ -17,6 +17,16 @@ namespace PointsGeneration
             pointClass = -1;
             radius = -1;
         }
+        public MultidimensionalPoint(double number)
+        {
+            coordinates = new double[15];
+            for (int i = 0; i < coordinates.Length; ++i )
+            {
+                coordinates[i] = number;
+            }
+            pointClass = -1;
+            radius = -1;
+        }
         public MultidimensionalPoint(MultidimensionalPoint a)
         {
             coordinates = new double[15];
