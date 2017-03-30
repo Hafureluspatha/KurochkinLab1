@@ -11,15 +11,9 @@ namespace PointsGeneration
         public double[] coordinates;
         public int pointClass;
         public double radius;
-        public MultidimensionalPoint()
+        public MultidimensionalPoint(int dimensions, double number)
         {
-            coordinates = new double[15];
-            pointClass = -1;
-            radius = -1;
-        }
-        public MultidimensionalPoint(double number)
-        {
-            coordinates = new double[15];
+            coordinates = new double[dimensions];
             for (int i = 0; i < coordinates.Length; ++i )
             {
                 coordinates[i] = number;
@@ -29,7 +23,7 @@ namespace PointsGeneration
         }
         public MultidimensionalPoint(MultidimensionalPoint a)
         {
-            coordinates = new double[15];
+            coordinates = new double[a.coordinates.Length];
             pointClass = a.pointClass;
             radius = a.radius;
             for(int i = 0; i < coordinates.Length; ++i)
@@ -52,6 +46,16 @@ namespace PointsGeneration
             {
                 coordinates[i] += vector[i];
             }
+        }
+        public override string ToString()
+        {
+            StringBuilder overallString = new StringBuilder();
+            for (int i = 0; i < coordinates.Length; ++i )
+            {
+                overallString.Append(coordinates[i].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture) + ',');
+            }
+            overallString.Append(pointClass);
+            return overallString.ToString();
         }
     }
 }

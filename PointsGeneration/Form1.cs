@@ -16,10 +16,9 @@ namespace PointsGeneration
 {
     // Расстояние Евклидово
     // Пересечение - высчитывается вхождение класса малого радиуса в класс большего радиуса. Классы пересекаются по двое.
-    // TODO:  need dimension tolerance
+    // TODO:  need dimension tolerance. Check output format.
     public partial class PointGeneration : Form
     {
-        static StringBuilder csv = new StringBuilder();
         static MultidimensionalPoint[] points;
         static string path;
         static int userPointsCountInClass;
@@ -66,7 +65,7 @@ namespace PointsGeneration
             points = new MultidimensionalPoint[userPointsCountInClass * 15];
             for (int i = 0; i < points.Length; ++i)
             {
-                points[i] = new MultidimensionalPoint();
+                points[i] = new MultidimensionalPoint(userNumberOfDimensions, 0);
             }
 
             if(LinearSeparability.SelectedIndex == 0)
@@ -91,7 +90,7 @@ namespace PointsGeneration
             int firstClassIndex;
             int secondClassIndex;
             //Generating 8 groups of 2
-            for (int groupIterator = 0; groupIterator < 7; groupIterator++ )
+            for (int groupIterator = 0; groupIterator < 7 ; groupIterator++ )
             {
                 // First class
 
@@ -104,12 +103,12 @@ namespace PointsGeneration
 
                 for (int i = 0; i < points[firstClassIndex].coordinates.Length; ++i)
                 {
-                    points[firstClassIndex].coordinates[i] = random.Next(1000) - 500;
+                    points[firstClassIndex].coordinates[i] = random.NextDouble() * 1000 - 500;
                 }
                 if (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass))
                 {
                     double[] shiftingVector;
-                    shiftingVector = GenerateNewShiftingVector(15, shiftingValueForNonSeparable);
+                    shiftingVector = GenerateNewShiftingVector(userNumberOfDimensions, shiftingValueForNonSeparable, random);
                     do
                     {
                         for(int i = 0; i < points[firstClassIndex].coordinates.Length; ++i)
@@ -134,7 +133,7 @@ namespace PointsGeneration
                 Debug.Assert(initialCrossRate > 0.8, "InitialCrossRate is really low");
 
                 // Defining where the zero interseption is located
-                double[] movingVector = GenerateNewShiftingVector(15, shiftingValueForNonSeparable);
+                double[] movingVector = GenerateNewShiftingVector(userNumberOfDimensions, shiftingValueForNonSeparable, random);
                 bool overallCrossRateIsOk = false;
                 do{
                     points[secondClassIndex].Add(movingVector);
@@ -164,7 +163,7 @@ namespace PointsGeneration
             // First class
             for (int i = 0; i < points[0].coordinates.Length; ++i)
             {
-                points[0].coordinates[i] = random.Next(1000) - 500;
+                points[0].coordinates[i] = random.NextDouble() * 1000 - 500;
             }
             points[0].radius = GenerateRadius(userFirstRadius, userDiffInRadiuses, random);
             points[0].pointClass = pointClass;
@@ -175,7 +174,7 @@ namespace PointsGeneration
             double[] shiftingVector;
             for (int overallIteator = 1; overallIteator < 15; overallIteator++)
             {
-                shiftingVector = GenerateNewShiftingVector(15, shiftingValueForSeparable);
+                shiftingVector = GenerateNewShiftingVector(userNumberOfDimensions, shiftingValueForSeparable, random);
                 trueIndex = overallIteator * userPointsCountInClass;
                 // Generate central point of a class
                 for (int i = 0; i < points[trueIndex].coordinates.Length; ++i)
@@ -186,7 +185,7 @@ namespace PointsGeneration
                 points[trueIndex].pointClass = pointClass;
                 while (ThisClassCrossesOtherClasses(trueIndex, userDistBetweenClasses, userDistBetweenClassesDiff, random))
                 {
-                    ShiftPoint(points[trueIndex], shiftingVector);
+                    points[trueIndex].Add(shiftingVector);
                 }
 
                 // Generating all other points inside the group
@@ -197,72 +196,50 @@ namespace PointsGeneration
 
         private void WriteToFile(string path)
         {
+            StringBuilder csv = new StringBuilder();
             //ValidateData();
-            for (int i = 0; i < points.Length; ++i)
+            for (int i = 0; i < points.Length - 1; ++i)
             {
-                csv.Append(String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}\n",
-                    points[i].coordinates[0].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[1].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[2].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[3].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[4].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[5].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[6].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[7].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[8].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[9].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[10].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[11].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[12].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[13].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].coordinates[14].ToString("0.000000", System.Globalization.CultureInfo.InvariantCulture),
-                    points[i].pointClass));
+                csv.Append(points[i].ToString() + "\n");
             }
+            csv.Append(points[points.Length - 1].ToString());
             File.WriteAllText(path, csv.ToString(), Encoding.UTF8);
             TimeSpan time = watch.Elapsed;
             watch.Stop();
-            status.Text = String.Format("Done in {0} ms", time.Milliseconds);
+            status.Text = String.Format("Done in {0} ms", time.Seconds * 1000 + time.Milliseconds);
         }
 
         private double Distance(MultidimensionalPoint a, MultidimensionalPoint b)
         {
             double sum = 0;
-            for (int i = 0; i < Math.Min(a.coordinates.Length, b.coordinates.Length); ++i )
+            Debug.Assert(a.coordinates.Length == b.coordinates.Length);
+            for (int i = 0; i < a.coordinates.Length; ++i)
             {
                 sum += Math.Pow(a.coordinates[i] - b.coordinates[i], 2);
             }
             return Math.Sqrt(sum);
         }
 
-        private bool ThisClassCrossesOtherClasses(int index, double distanceBetweenClasses, double distanceDifference, Random rand)
+        private bool ThisClassCrossesOtherClasses(int centerPointIndex, double distanceBetweenClasses, double distanceDifference, Random rand)
         {
             double actualDistanceBetweenClasses = distanceBetweenClasses * (1 + rand.NextDouble() * distanceDifference * distanceBetweenClasses);
-            for(int i = index - userPointsCountInClass; i >= 0; i-=userPointsCountInClass)
+            for(int i = centerPointIndex - userPointsCountInClass; i >= 0; i-=userPointsCountInClass)
             {
                 Debug.Assert(points[i].radius > 0, "ThisCentralPointIntersectsWithOtherClasses");
-                if (Distance(points[i], points[index]) < points[i].radius + points[index].radius + actualDistanceBetweenClasses)
+                if (Distance(points[i], points[centerPointIndex]) < points[i].radius + points[centerPointIndex].radius + actualDistanceBetweenClasses)
                 {
                     return true;
                 }
             }
             return false;
         }
-
-        private void ShiftPoint(MultidimensionalPoint p, double[] shiftingVector)
-        {
-            for(int i = 0; i< p.coordinates.Length; ++i)
-            {
-                p.coordinates[i] += shiftingVector[i];
-            }
-        }
-
-        private double[] GenerateNewShiftingVector (int size, double coordinateDifference)
+        
+        private double[] GenerateNewShiftingVector (int size, double coordinateDifference, Random rand_)
         {
             double[] newShiftingVector = new double[size];
-            Random rand = new Random();
             for (int i = 0; i < newShiftingVector.Length; ++i)
             {
-                if (rand.Next(1000) - 500 < 0)
+                if (rand_.NextDouble() > 0.5)
                 {
                     newShiftingVector[i] = (-1) * coordinateDifference;
                 }
@@ -329,10 +306,11 @@ namespace PointsGeneration
         private void GeneratePointsOfClass(int startingIndex_, int pointClass_, Random random)
         {
             int sign = 1;
-            if (thoroughGenerationOfPoints)
+            if (thoroughGenerationOfPoints || userNumberOfDimensions < 4)
             {
                 for(int i = 1; i < userPointsCountInClass; ++i)
                 {
+                    points[startingIndex_ + i].pointClass = pointClass_;
                     do 
                     {
                         for(int j = 0; j < points[startingIndex_].coordinates.Length; ++j)
@@ -345,8 +323,8 @@ namespace PointsGeneration
             }
             else
             {
-                MultidimensionalPoint a = new MultidimensionalPoint(0);
-                MultidimensionalPoint b = new MultidimensionalPoint(points[startingIndex_].radius);
+                MultidimensionalPoint a = new MultidimensionalPoint(userNumberOfDimensions, 0);
+                MultidimensionalPoint b = new MultidimensionalPoint(userNumberOfDimensions, points[startingIndex_].radius);
                 double dist = Distance(a, b);
                 double transformingValue = points[startingIndex_].radius / dist;
 
