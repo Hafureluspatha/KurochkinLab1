@@ -5,9 +5,9 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointsGeneration", "PointsGeneration.csproj", "{CC3913BF-8BDB-489F-80DE-65B41D0228E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork", "..\NeuralNetwork\NeuralNetwork.csproj", "{79B70BEF-56C5-405F-AFA0-4AAAC3F932A8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "..\test\test.csproj", "{D118DD49-B91B-4286-9550-D746DBDB34B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NN", "..\NN\NN.csproj", "{7E185EFE-AD01-47AF-A689-22DE3A22124A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +19,14 @@ Global
 		{CC3913BF-8BDB-489F-80DE-65B41D0228E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC3913BF-8BDB-489F-80DE-65B41D0228E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC3913BF-8BDB-489F-80DE-65B41D0228E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79B70BEF-56C5-405F-AFA0-4AAAC3F932A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79B70BEF-56C5-405F-AFA0-4AAAC3F932A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79B70BEF-56C5-405F-AFA0-4AAAC3F932A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79B70BEF-56C5-405F-AFA0-4AAAC3F932A8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D118DD49-B91B-4286-9550-D746DBDB34B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D118DD49-B91B-4286-9550-D746DBDB34B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D118DD49-B91B-4286-9550-D746DBDB34B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D118DD49-B91B-4286-9550-D746DBDB34B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E185EFE-AD01-47AF-A689-22DE3A22124A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E185EFE-AD01-47AF-A689-22DE3A22124A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E185EFE-AD01-47AF-A689-22DE3A22124A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E185EFE-AD01-47AF-A689-22DE3A22124A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

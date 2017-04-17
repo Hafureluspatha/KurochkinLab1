@@ -11,12 +11,12 @@ namespace PointsGeneration
         public double[] coordinates;
         public int pointClass;
         public double radius;
-        public MultidimensionalPoint(int dimensions, double number)
+        public MultidimensionalPoint(int dimensions, double valueOfCoordinates)
         {
             coordinates = new double[dimensions];
             for (int i = 0; i < coordinates.Length; ++i )
             {
-                coordinates[i] = number;
+                coordinates[i] = valueOfCoordinates;
             }
             pointClass = -1;
             radius = -1;
@@ -30,6 +30,16 @@ namespace PointsGeneration
             {
                 coordinates[i] = a.coordinates[i];
             }
+        }
+        public MultidimensionalPoint(double[] outerSourcePointsnClasswoRadius)
+        {
+            coordinates = new double[outerSourcePointsnClasswoRadius.Length - 1];
+            for (int i = 0; i < outerSourcePointsnClasswoRadius.Length - 1; ++i)
+            {
+                coordinates[i] = outerSourcePointsnClasswoRadius[i];
+            }
+            radius = -1;
+            pointClass = Convert.ToInt32(outerSourcePointsnClasswoRadius[outerSourcePointsnClasswoRadius.Length - 1]);
         }
         public void Add(double number)
         {

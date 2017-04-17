@@ -52,6 +52,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.status = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
+            this.loneClass = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // LinearSeparability
@@ -76,7 +77,7 @@
             // 
             // GenerateButton
             // 
-            this.GenerateButton.Location = new System.Drawing.Point(543, 255);
+            this.GenerateButton.Location = new System.Drawing.Point(784, 254);
             this.GenerateButton.Name = "GenerateButton";
             this.GenerateButton.Size = new System.Drawing.Size(118, 22);
             this.GenerateButton.TabIndex = 2;
@@ -216,7 +217,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(586, 283);
+            this.button1.Location = new System.Drawing.Point(827, 282);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 23;
@@ -242,7 +243,7 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(526, 313);
+            this.status.Location = new System.Drawing.Point(767, 312);
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(135, 20);
             this.status.TabIndex = 27;
@@ -250,17 +251,28 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(479, 316);
+            this.label12.Location = new System.Drawing.Point(720, 315);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(41, 13);
             this.label12.TabIndex = 26;
             this.label12.Text = "Статус";
             // 
+            // loneClass
+            // 
+            this.loneClass.AutoSize = true;
+            this.loneClass.Location = new System.Drawing.Point(639, 153);
+            this.loneClass.Name = "loneClass";
+            this.loneClass.Size = new System.Drawing.Size(130, 17);
+            this.loneClass.TabIndex = 28;
+            this.loneClass.Text = "Один класс вдалеке";
+            this.loneClass.UseVisualStyleBackColor = true;
+            // 
             // PointGeneration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(670, 344);
+            this.ClientSize = new System.Drawing.Size(914, 344);
+            this.Controls.Add(this.loneClass);
             this.Controls.Add(this.status);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.dimensions);
@@ -318,6 +330,7 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.TextBox status;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.CheckBox loneClass;
     }
 }
 

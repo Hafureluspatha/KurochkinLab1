@@ -32,6 +32,7 @@ namespace PointsGeneration
         static double shiftingValueForNonSeparable = 1;
         static Stopwatch watch = new Stopwatch();
         static bool thoroughGenerationOfPoints = false;
+        static bool needLoneClass = false;
         static int userNumberOfDimensions;
 
         public PointGeneration()
@@ -61,6 +62,7 @@ namespace PointsGeneration
             userCrossRateInDouble = Convert.ToDouble(intersectionPercentage.Text) / 100;
             crossOkDeltaInClasses = Math.Max(0.01, 1.0/userPointsCountInClass);
             userNumberOfDimensions = Convert.ToInt32(dimensions.Text);
+            needLoneClass = loneClass.Checked;
 
             points = new MultidimensionalPoint[userPointsCountInClass * 15];
             for (int i = 0; i < points.Length; ++i)
@@ -105,7 +107,7 @@ namespace PointsGeneration
                 {
                     points[firstClassIndex].coordinates[i] = random.NextDouble() * 1000 - 500;
                 }
-                if (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass))
+                if (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass, 3))
                 {
                     double[] shiftingVector;
                     shiftingVector = GenerateNewShiftingVector(userNumberOfDimensions, shiftingValueForNonSeparable, random);
@@ -116,7 +118,7 @@ namespace PointsGeneration
                             points[firstClassIndex].coordinates[i] += shiftingVector[i];
                         }
 
-                    } while (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass));
+                    } while (!ThisCentralPointIsFarFromOtherClasses(groupIterator, userPointsCountInClass, 3));
                 }
                 GeneratePointsOfClass(firstClassIndex, pointClass, random);
 
@@ -192,6 +194,26 @@ namespace PointsGeneration
                 GeneratePointsOfClass(trueIndex, pointClass, random);
                 pointClass++;
             }
+            if(needLoneClass)
+            {
+                pointClass--;
+                shiftingVector = GenerateNewShiftingVector(userNumberOfDimensions, shiftingValueForSeparable, random);
+                trueIndex = 14 * userPointsCountInClass;
+                // Generate central point of a class
+                for (int i = 0; i < points[trueIndex].coordinates.Length; ++i)
+                {
+                    points[trueIndex].coordinates[i] = points[trueIndex - 1].coordinates[i];
+                }
+                points[trueIndex].radius = GenerateRadius(userFirstRadius, userDiffInRadiuses, random);
+                points[trueIndex].pointClass = pointClass;
+                while (!ThisCentralPointIsFarFromOtherClasses(trueIndex, userPointsCountInClass, 10))
+                {
+                    points[trueIndex].Add(shiftingVector);
+                }
+
+                // Generating all other points inside the group
+                GeneratePointsOfClass(trueIndex, pointClass, random);
+            }
         }
 
         private void WriteToFile(string path)
@@ -262,12 +284,12 @@ namespace PointsGeneration
             return initialRadius + differenceInRadius * randResult * initialRadius;
         }
 
-        private bool ThisCentralPointIsFarFromOtherClasses(int index, int pointsInClass)
+        private bool ThisCentralPointIsFarFromOtherClasses(int index, int pointsInClass, int threeIsUsuallyFar)
         {
             for (int i = index - pointsInClass; i >= 0; i -= pointsInClass)
             {
                 Debug.Assert(points[i].radius > 0, "ThisCentralPointIsFarFromOtherClasses");
-                if (Distance(points[i], points[index]) < 3 * (points[i].radius + points[index].radius))
+                if (Distance(points[i], points[index]) < threeIsUsuallyFar * (points[i].radius + points[index].radius))
                 {
                     return false;
                 }

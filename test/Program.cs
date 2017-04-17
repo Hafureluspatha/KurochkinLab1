@@ -15,11 +15,16 @@ namespace test
 
         static void test()
         {
-            int[] a = new int[3] { 3, 4, 5 };
-            int[] b = new int[3] { 0, 0, 0 };
-            var z = a;
-            z[0] = 10;
-            a[0] = 9;
+            List<double[,]> one = new List<double[,]>();
+            List<double[,]> two = new List<double[,]>();
+            double[,] matrix = new double[2, 2] { { 1, 2 }, { 3, 4 } };
+            one.Add(matrix);
+            matrix = new double[2, 2] { { 9, 8 }, { 7, 6 } };
+            two.Add(matrix);
+
+            one[0][0, 0] = 3;
+            two[0][0, 0] = 4;
+            int k = 0;
         }
     }
 }
