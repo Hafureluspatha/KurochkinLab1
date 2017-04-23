@@ -53,6 +53,10 @@
             this.status = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.loneClass = new System.Windows.Forms.CheckBox();
+            this.allCrossed = new System.Windows.Forms.CheckBox();
+            this.allCrossedBar1 = new System.Windows.Forms.CheckBox();
+            this.classCount = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // LinearSeparability
@@ -221,7 +225,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 23;
-            this.button1.Text = "MassTest";
+            this.button1.Text = "Показать";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -267,11 +271,51 @@
             this.loneClass.Text = "Один класс вдалеке";
             this.loneClass.UseVisualStyleBackColor = true;
             // 
+            // allCrossed
+            // 
+            this.allCrossed.AutoSize = true;
+            this.allCrossed.Location = new System.Drawing.Point(383, 257);
+            this.allCrossed.Name = "allCrossed";
+            this.allCrossed.Size = new System.Drawing.Size(121, 17);
+            this.allCrossed.TabIndex = 29;
+            this.allCrossed.Text = "Все пересекаются";
+            this.allCrossed.UseVisualStyleBackColor = true;
+            // 
+            // allCrossedBar1
+            // 
+            this.allCrossedBar1.AutoSize = true;
+            this.allCrossedBar1.Location = new System.Drawing.Point(511, 257);
+            this.allCrossedBar1.Name = "allCrossedBar1";
+            this.allCrossedBar1.Size = new System.Drawing.Size(194, 17);
+            this.allCrossedBar1.TabIndex = 30;
+            this.allCrossedBar1.Text = "Все пересекаются кроме одного";
+            this.allCrossedBar1.UseVisualStyleBackColor = true;
+            // 
+            // classCount
+            // 
+            this.classCount.Location = new System.Drawing.Point(582, 41);
+            this.classCount.Name = "classCount";
+            this.classCount.Size = new System.Drawing.Size(168, 20);
+            this.classCount.TabIndex = 31;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(582, 25);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(168, 13);
+            this.label13.TabIndex = 32;
+            this.label13.Text = "Сколько классов генерировать";
+            // 
             // PointGeneration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 344);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.classCount);
+            this.Controls.Add(this.allCrossedBar1);
+            this.Controls.Add(this.allCrossed);
             this.Controls.Add(this.loneClass);
             this.Controls.Add(this.status);
             this.Controls.Add(this.label12);
@@ -331,6 +375,10 @@
         private System.Windows.Forms.TextBox status;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.CheckBox loneClass;
+        private System.Windows.Forms.CheckBox allCrossed;
+        private System.Windows.Forms.CheckBox allCrossedBar1;
+        private System.Windows.Forms.TextBox classCount;
+        private System.Windows.Forms.Label label13;
     }
 }
 

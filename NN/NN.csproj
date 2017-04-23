@@ -48,19 +48,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataReader.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="NN.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="NN.Designer.cs">
+      <DependentUpon>NN.cs</DependentUpon>
     </Compile>
     <Compile Include="Neuron.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestDataGenerator.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="NN.resx">
+      <DependentUpon>NN.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -85,9 +85,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PointsGeneration\Common\Common.csproj">
+      <Project>{ac604876-da08-49f2-b98e-6400bc38a6c3}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PointsGeneration\PointsGeneration.csproj">
       <Project>{cc3913bf-8bdb-489f-80de-65b41d0228e7}</Project>
       <Name>PointsGeneration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Visualizer\Visualizer.csproj">
+      <Project>{007dbbff-064e-4ce8-a39a-959169f8680d}</Project>
+      <Name>Visualizer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

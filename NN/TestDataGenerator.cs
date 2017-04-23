@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using PointsGeneration;
+using Common;
 
 namespace NN
 {
@@ -15,6 +16,12 @@ namespace NN
         public static int andFunc(double first, double second)
         {
             return Convert.ToInt32(Convert.ToBoolean(first) && Convert.ToBoolean(second));
+        }
+        public static int xorFunc(double first, double second)
+        {
+            bool p = Convert.ToBoolean(first);
+            bool q = Convert.ToBoolean(second);
+            return Convert.ToInt32((p || q) && !(p && q));
         }
         public static MultidimensionalPoint[] InitializeArrayOfPoints(int size)
         {

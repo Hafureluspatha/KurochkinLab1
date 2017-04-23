@@ -4,13 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PointsGeneration
+namespace Common
 {
     public class MultidimensionalPoint
     {
         public double[] coordinates;
         public int pointClass;
         public double radius;
+        public int classifiedAs;
+
         public MultidimensionalPoint(int dimensions, double valueOfCoordinates)
         {
             coordinates = new double[dimensions];
@@ -20,12 +22,14 @@ namespace PointsGeneration
             }
             pointClass = -1;
             radius = -1;
+            classifiedAs = -1;
         }
         public MultidimensionalPoint(MultidimensionalPoint a)
         {
             coordinates = new double[a.coordinates.Length];
             pointClass = a.pointClass;
             radius = a.radius;
+            classifiedAs = a.classifiedAs;
             for(int i = 0; i < coordinates.Length; ++i)
             {
                 coordinates[i] = a.coordinates[i];
@@ -40,6 +44,7 @@ namespace PointsGeneration
             }
             radius = -1;
             pointClass = Convert.ToInt32(outerSourcePointsnClasswoRadius[outerSourcePointsnClasswoRadius.Length - 1]);
+            classifiedAs = -1;
         }
         public void Add(double number)
         {
