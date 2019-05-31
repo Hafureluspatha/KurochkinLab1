@@ -18,4 +18,4 @@ was done through
 The solution is definitely not optimal, but it worked well enough based on the limitation that we had - less than 500 points 
 for one class.
 
-We also had to implement backpropagation algorithm for the NN, as well as the whole NN itself from scratch.
+We also had to implement the backpropagation algorithm for the NN, as well as the whole NN itself from scratch.
