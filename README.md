@@ -4,7 +4,7 @@ This repository contains a finished version of the first ML course assignment at
 The task was to create a generator of two spheres of randomly distributed points that have a certain percentage _N_ of 
 intersection.
 After that, one has to create a linear classifier out of fully connected neural layers, which should classify the points 
-correctly at least in _N_% of cases.
+correctly at least in approximately _(100 - N)_% of cases.
 
 The task of calculating an intersection of N-dimensional spheres was too hard for me at the moment, therefore spheres placement 
 was done through
